@@ -1,0 +1,110 @@
+Backend1:
+  - Dockerfile:
+"FROM python:3.13-slim
+WORKDIR /app
+COPY . /app 
+RUN pip install -r requirements.txt 
+CMD ["python", "main.py"]"
+
+  - main.py
+"from flask import Flask, jsonify
+import socket
+
+app = Flask(__name__)
+
+@app.route('/')
+def home():
+    return f"Server 1 - TokoKita | Hostname: {socket.gethostname()}"
+
+@app.route('/products')
+def products():
+    data = [
+        {"id": 1, "name": "Laptop", "price": 12000000},
+        {"id": 2, "name": "Mouse", "price": 150000},
+        {"id": 3, "name": "Keyboard", "price": 350000}
+    ]
+    return jsonify(data)
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)"
+
+  - requirements.txt
+"flask"
+
+
+
+Backend2:
+  - Dockerfile
+"FROM python:3.13-slim
+WORKDIR /app
+COPY . /app 
+RUN pip install -r requirements.txt 
+CMD ["python", "main.py"]"
+
+  - main.py
+"from flask import Flask, jsonify
+import socket
+
+app = Flask(__name__)
+
+@app.route('/')
+def home():
+    return f"Server 2 - TokoKita | Hostname: {socket.gethostname()}"
+
+@app.route('/products')
+def products():
+    data = [
+        {"id": 1, "name": "Laptop", "price": 12000000},
+        {"id": 2, "name": "Mouse", "price": 150000},
+        {"id": 3, "name": "Keyboard", "price": 350000}
+    ]
+    return jsonify(data)
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)"
+
+  - requirements.txt
+"flask"
+
+
+
+Nginx:
+  - Dockerfile
+"FROM nginx
+RUN rm /etc/nginx/conf.d/default.conf
+COPY ./nginx.conf /etc/nginx/conf.d/default.conf"
+
+  - docker-compose.yml
+"services:
+  backend1:
+    build: ../backend1
+    ports:
+      - "5001:5000"
+
+  backend2:
+    build: ../backend2
+    ports:
+      - "5002:5000"
+
+  nginx:
+    build: .
+    ports:
+      - "80:80"
+    depends_on:
+      - backend1
+      - backend2
+"
+
+  - nginx.conf
+"upstream app {
+    server backend1:5000 weight=3;
+    server backend2:5000 weight=1;
+}
+
+server {
+    listen 80;
+
+    location / {
+        proxy_pass http://app;
+    }
+}"
