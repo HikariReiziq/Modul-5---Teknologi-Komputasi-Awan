@@ -1,5 +1,3 @@
-readme_final_content = """# Praktikum Modul 5: Load Balancer Sederhana - TokoKita
-
 Proyek ini merupakan bagian dari Praktikum Teknologi Komputasi Awan (Modul 5). Dokumentasi ini berisi nama anggota kelompok, panduan lengkap untuk menjalankan sistem, serta bukti *screenshot* keberhasilan implementasi *Load Balancing* menggunakan **NGINX** dengan algoritma **Weighted Round Robin** yang mengarah ke dua server *backend* berbasis **Flask (Python)**.
 
 ---
